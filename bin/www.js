@@ -1,7 +1,7 @@
 const http = require("http");
 
 // 这里将对 req/res 的具体处理进行模块化业务逻辑抽离
-const serverHandler = require("../app");
+const serverHandler = require("../server/app");
 
 const server = http.createServer(serverHandler);
 
