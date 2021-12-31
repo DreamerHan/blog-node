@@ -13,6 +13,9 @@ module.exports = (req) => {
 
         resolve();
       });
+    } else {
+      req.body = {};
+      resolve();
     }
   });
 };
