@@ -1,11 +1,24 @@
+const { SuccessModel, ErrorModel } = require("../model/resModel");
+const { loginIn } = require("../controller/user");
+
 const handleUserRouter = (req, res) => {
   const { method, path } = req;
 
   // 登录
   if (method === "POST" && path === "/api/user/login") {
-    return {
-      msg: "这是登录的接口",
-    };
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return new ErrorModel("登录失败，没有 username 或 password");
+    }
+
+    const result = loginIn(req.body);
+
+    if (result) {
+      return new SuccessModel("登录成功");
+    } else {
+      return new ErrorModel("登录失败");
+    }
   }
 
   // 登录校验
