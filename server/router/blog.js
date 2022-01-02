@@ -8,18 +8,19 @@ const {
 
 const { SuccessModel, ErrorModel } = require("../model/resModel");
 
-const handlerBlogRouter = (req, res) => {
+const handlerBlogRouter = async (req, res) => {
   const { method, path } = req;
 
   // 获取博客列表
   if (method === "GET" && path === "/api/blog/list") {
     const { author, keyword } = req.query;
 
-    if (!author || !keyword) {
-      return new ErrorModel("获取失败, 缺少 author 或 keyword 字段");
+    if (!author && !keyword) {
+      return new ErrorModel("获取失败, 没有 author 和 keyword 字段");
     }
 
-    const result = getList({ author, keyword });
+    const result = await getList({ author, keyword });
+
     if (result) {
       return new SuccessModel(result, "获取成功");
     } else {
@@ -33,16 +34,13 @@ const handlerBlogRouter = (req, res) => {
       return new ErrorModel("获取失败，没有博客 id");
     }
 
-    const result = getDetail(req.query.id);
+    const result = await getDetail(req.query.id);
 
     if (result) {
       return new SuccessModel(result, "获取成功");
     } else {
       return new ErrorModel("获取失败");
     }
-    return {
-      msg: "这是获取博客详情的接口",
-    };
   }
 
   // 新建一篇博客
@@ -53,12 +51,12 @@ const handlerBlogRouter = (req, res) => {
       return new ErrorModel("创建失败，没有 title 或 content 或 author");
     }
 
-    const result = newBlog(req.body);
+    const result = await newBlog(req.body);
 
     if (result) {
-      return new SuccessModel(result, "获取成功");
+      return new SuccessModel(result, "新建博客成功");
     } else {
-      return new ErrorModel("获取失败");
+      return new ErrorModel("新建博客失败");
     }
   }
 
@@ -67,10 +65,12 @@ const handlerBlogRouter = (req, res) => {
     const { title, content, id } = req.body;
 
     if (!id) {
-      return new ErrorModel("更新失败，没有博客 id");
+      return new ErrorModel("更新失败, 没有传博客 id");
+    } else if (!title && !content) {
+      return new ErrorModel("title 和 content 都没有任何更新");
     }
 
-    const result = newBlog(req.body);
+    const result = await updateBlog(req.body);
 
     if (result) {
       return new SuccessModel(result, "更新成功");
@@ -87,7 +87,7 @@ const handlerBlogRouter = (req, res) => {
       return new ErrorModel("删除失败，没有博客 id 或 author");
     }
 
-    const result = deleteBlog(req.body);
+    const result = await deleteBlog(req.body);
 
     if (result) {
       return new SuccessModel(result, "更新成功");

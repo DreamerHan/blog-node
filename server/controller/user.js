@@ -1,14 +1,18 @@
-const loginIn = (loginInfo) => {
+const execSQL = require("../db/mysql");
+
+const login = async (loginInfo) => {
   const { username, password } = loginInfo;
 
-  // 模拟数据
-  if (username === "zhangsan" && password === "123") {
-    return true;
-  } else {
-    return false;
-  }
+  const sql = `
+    select * from users 
+    where username='${username}' and password='${password}'
+  `;
+
+  const [err, result] = await execSQL(sql);
+
+  return err ? undefined : result[0];
 };
 
 module.exports = {
-  loginIn,
+  login,
 };

@@ -1,7 +1,7 @@
 const { SuccessModel, ErrorModel } = require("../model/resModel");
-const { loginIn } = require("../controller/user");
+const { login } = require("../controller/user");
 
-const handleUserRouter = (req, res) => {
+const handleUserRouter = async (req, res) => {
   const { method, path } = req;
 
   // 登录
@@ -12,7 +12,7 @@ const handleUserRouter = (req, res) => {
       return new ErrorModel("登录失败，没有 username 或 password");
     }
 
-    const result = loginIn(req.body);
+    const result = await login(req.body);
 
     if (result) {
       return new SuccessModel("登录成功");
