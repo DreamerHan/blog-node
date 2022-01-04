@@ -1,5 +1,6 @@
 const getQueryData = require("./utils/getQueryData");
 const getPostData = require("./utils/getPostData");
+const getCookie = require("./utils/getCookie");
 
 const { handleUserRouter, handlerBlogRouter } = require("./router/index");
 
@@ -12,6 +13,9 @@ module.exports = async (req, res) => {
 
   // postData 处理
   await getPostData(req);
+
+  // 获取 cookie 存入 req 中
+  getCookie(req);
 
   // user 路由接入
   const userRes = await handleUserRouter(req, res);
