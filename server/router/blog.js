@@ -8,6 +8,18 @@ const {
 
 const { SuccessModel, ErrorModel } = require("../model/resModel");
 
+// 从 redis 中获取登录状态
+const { redisGet } = require("../db/redis");
+
+// 登录状态查询
+async function loginCheck(req) {
+  const [err, redisSession] = await redisGet("session");
+
+  if (!redisSession || !redisSession[req.cookie.userid]) {
+    return new ErrorModel("你还没有登录哦~");
+  }
+}
+
 const handlerBlogRouter = async (req, res) => {
   const { method, path } = req;
 
@@ -45,6 +57,12 @@ const handlerBlogRouter = async (req, res) => {
 
   // 新建一篇博客
   if (method === "POST" && path === "/api/blog/new") {
+    // 如果未登录，loginState 才有值
+    const loginState = await loginCheck(req);
+    if (loginState) {
+      return loginState;
+    }
+
     const { title, content, author } = req.body;
 
     if (!title || !content || !author) {
@@ -62,6 +80,12 @@ const handlerBlogRouter = async (req, res) => {
 
   // 更新博客
   if (method === "POST" && path === "/api/blog/update") {
+    // 如果未登录，loginState 才有值
+    const loginState = await loginCheck(req);
+    if (loginState) {
+      return loginState;
+    }
+
     const { title, content, id } = req.body;
 
     if (!id) {
@@ -81,6 +105,12 @@ const handlerBlogRouter = async (req, res) => {
 
   // 删除博客
   if (method === "POST" && path === "/api/blog/del") {
+    // 如果未登录，loginState 才有值
+    const loginState = await loginCheck(req);
+    if (loginState) {
+      return loginState;
+    }
+
     const { id, author } = req.body;
 
     if (!id || !author) {
