@@ -4,7 +4,17 @@ const getCookie = require("./utils/getCookie");
 
 const { handleUserRouter, handlerBlogRouter } = require("./router/index");
 
+// 日志
+const { accessLog } = require("./utils/log");
+
 module.exports = async (req, res) => {
+  const { method, url, headers } = req;
+
+  if (url === "/favicon.ico") return;
+
+  // 记录访问日志 access.log
+  accessLog(`${method} -- ${url} -- ${headers["user-agent"]} -- ${Date.now()}`);
+
   // 设置数据返回格式为 json 形式
   res.setHeader("Content-type", "application/json; text/plain;charset=utf-8");
 
