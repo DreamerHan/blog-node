@@ -16,9 +16,9 @@ connection.connect(function (err) {
 });
 
 // 统一执行 sql 语句的函数
-function execSQL(sql) {
+function execSQL(sql, data) {
   const promise = new Promise((resolve, reject) => {
-    connection.query(sql, (err, result) => {
+    connection.query(sql, data, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -31,4 +31,7 @@ function execSQL(sql) {
   return promise;
 }
 
-module.exports = execSQL;
+module.exports = {
+  execSQL,
+  escape: mysql.escape
+};

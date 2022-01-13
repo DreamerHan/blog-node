@@ -120,9 +120,9 @@ const handlerBlogRouter = async (req, res) => {
     const result = await deleteBlog(req.body);
 
     if (result) {
-      return new SuccessModel(result, "更新成功");
+      return new SuccessModel(result, "删除成功");
     } else {
-      return new ErrorModel("更新失败");
+      return new ErrorModel("删除失败");
     }
   }
 };
