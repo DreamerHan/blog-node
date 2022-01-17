@@ -1,7 +1,8 @@
 const { execSQL } = require("../db/mysql");
+const generatePassword = require("../utils/cryp");
 
-const login = async (loginInfo) => {
-  const { username, password } = loginInfo;
+const login = async ({ username, password }) => {
+  password = generatePassword(password);
 
   const sql = `
     select * from users 
