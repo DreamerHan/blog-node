@@ -14,14 +14,14 @@ const handleUserRouter = async (req, res) => {
   const { method, path } = req;
 
   // 登录
-  if (method === "GET" && path === "/api/user/login") {
-    const { username, password } = req.query;
+  if (method === "POST" && path === "/api/user/login") {
+    const { username, password } = req.body;
 
     if (!username || !password) {
       return new ErrorModel("登录失败，没有 username 或 password");
     }
 
-    const result = await login(req.query);
+    const result = await login(req.body);
 
     if (result) {
       const { id, username, relname } = result;
