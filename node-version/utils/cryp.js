@@ -2,7 +2,7 @@
 const crypto = require("crypto");
 
 // 密匙
-const SECRET_KEY = "Hzz_0219*";
+const SECRET_KEY = "Good_IDea_666*";
 
 // md5 加密
 function md5(content) {
