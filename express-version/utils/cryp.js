@@ -1,8 +1,7 @@
+const { SECRET_KEY } = require("../config/global");
+
 // crypto 是 nodejs 自身提供的加密的库
 const crypto = require("crypto");
-
-// 密匙
-const SECRET_KEY = "Hzz_0219*";
 
 // md5 加密
 function md5(content) {

@@ -1,6 +1,7 @@
 const { execSQL } = require("../db/mysql");
 const generatePassword = require("../utils/cryp");
 
+// 登录
 const login = async ({ username, password }) => {
   password = generatePassword(password);
 
