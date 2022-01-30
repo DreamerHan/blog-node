@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
@@ -21,7 +22,26 @@ app.use((req, res, next) => {
   }
 });
 
-app.use(logger("dev"));
+// 日志模式处理
+const ENV = process.env.NODE_ENV;
+if (ENV !== "prod") {
+  app.use(
+    logger("dev", {
+      stream: process.stdout, // 这是默认值
+    })
+  );
+} else {
+  const logFileName = path.join(__dirname, "logs", "access.log");
+  const writeStream = fs.createWriteStream(logFileName, {
+    flags: "a",
+  });
+
+  app.use(
+    logger("combined", {
+      stream: writeStream, // 写入流的方式写入文件
+    })
+  );
+}
 
 // 处理 post 请求的数据
 // 用来解析 content-type=application 形式的数据，放到 req.body 中
