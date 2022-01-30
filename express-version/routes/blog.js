@@ -10,6 +10,8 @@ const {
 } = require("../controller/blog");
 const { SuccessModel, ErrorModel } = require("../model/resModel");
 
+const loginCheck = require("../middleware/loginCheck");
+
 // blog 列表
 router.get("/list", async function (req, res, next) {
   const { author, keyword } = req.query;
@@ -45,7 +47,7 @@ router.get("/detail", async function (req, res, next) {
 });
 
 // blog 新增
-router.post("/new", async function (req, res, next) {
+router.post("/new", loginCheck, async function (req, res, next) {
   const { title, content, author } = req.body;
 
   if (!title || !content || !author) {
@@ -63,7 +65,7 @@ router.post("/new", async function (req, res, next) {
 });
 
 // blog 更新
-router.post("/update", async function (req, res, next) {
+router.post("/update", loginCheck, async function (req, res, next) {
   const { title, content, id } = req.body;
 
   if (!id) {
@@ -84,7 +86,7 @@ router.post("/update", async function (req, res, next) {
 });
 
 // blog 删除
-router.post("/del", async function (req, res, next) {
+router.post("/del", loginCheck, async function (req, res, next) {
   const { id, author } = req.body;
 
   if (!id || !author) {

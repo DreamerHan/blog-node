@@ -21,7 +21,6 @@ router.post("/login", async (req, res, next) => {
 
     // 假设登录后，session 中通过 userid 对应
     const userid = `${username}-${id}`;
-
     req.session[userid] = { id, username, relname };
 
     res.json(new SuccessModel("登录成功"));
@@ -31,7 +30,9 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.post("/login-test", (req, res, next) => {
-  if (req.session.userid) {
+  const { userid } = req.query;
+
+  if (req.session[userid]) {
     res.json(
       new SuccessModel({
         session: req.session,

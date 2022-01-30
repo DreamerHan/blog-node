@@ -15,6 +15,12 @@ const userRouter = require("./routes/user");
 
 const app = express();
 
+app.use((req, res, next) => {
+  if (req.path !== "/favicon.ico") {
+    next();
+  }
+});
+
 app.use(logger("dev"));
 
 // 处理 post 请求的数据
