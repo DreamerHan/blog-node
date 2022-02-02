@@ -5,6 +5,11 @@ const json = require("koa-json");
 const onerror = require("koa-onerror");
 const bodyparser = require("koa-bodyparser");
 const logger = require("koa-logger");
+const session = require("koa-generic-session");
+const redisStore = require("koa-redis");
+
+const { host, port } = require("./config/redis");
+const { SECRET_KEY } = require("./config/global");
 
 const blog = require("./routes/blog");
 const user = require("./routes/user");
@@ -43,6 +48,25 @@ app.use(async (ctx, next) => {
   const ms = new Date() - start;
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
 });
+
+// 设置 session 与 redis 的存储
+// 1.设置密钥
+app.keys = [SECRET_KEY];
+// session 的设置与存储
+app.use(
+  session({
+    // 设置 cookie
+    cookie: {
+      path: "/",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+    // 配置 redis
+    store: redisStore({
+      all: `${host}:${port}`,
+    }),
+  })
+);
 
 // routes
 app.use(blog.routes(), blog.allowedMethods());
