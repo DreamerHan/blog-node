@@ -8,6 +8,11 @@ const logger = require("koa-logger");
 const session = require("koa-generic-session");
 const redisStore = require("koa-redis");
 
+// 处理日志
+const path = require("path");
+const fs = require("fs");
+const morganLogger = require("koa-morgan");
+
 const { host, port } = require("./config/redis");
 const { SECRET_KEY } = require("./config/global");
 
@@ -16,6 +21,27 @@ const user = require("./routes/user");
 
 // error handler
 onerror(app);
+
+// 日志模式处理
+const ENV = process.env.NODE_ENV;
+if (ENV !== "prod") {
+  app.use(
+    morganLogger("dev", {
+      stream: process.stdout, // 这是默认值
+    })
+  );
+} else {
+  const logFileName = path.join(__dirname, "logs", "access.log");
+  const writeStream = fs.createWriteStream(logFileName, {
+    flags: "a",
+  });
+
+  app.use(
+    morganLogger("combined", {
+      stream: writeStream, // 写入流的方式写入文件
+    })
+  );
+}
 
 // middlewares
 
