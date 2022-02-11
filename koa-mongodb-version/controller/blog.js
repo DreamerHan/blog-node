@@ -1,87 +1,70 @@
-const { execSQL } = require("../db/mysql");
-
+const Blog = require("../db/models/Blog");
 // 防止 XSS 攻击
-const xss = require('xss')
+const xss = require("xss");
 
 // 最好不要从参数里直接结构，因为如果调用时没有传参，就会导致报错
 // 这里觉得最好的方式是用参数名获取参数，并且给参数设置默认值,这样后续的解构赋值不会因为漏传参数而导致报错
 const getList = async (params = {}) => {
   const { author = "", keyword = "" } = params;
 
-  let sql = `select * from blogs where 1=1 `;
+  const whereOpt = {};
+  if (author) whereOpt.author = author;
 
-  // keyword 不知道怎么用 ？占位符处理
-  if (keyword) {
-    sql += `and title like '%${keyword}%' `;
-  }
+  // keyword 支持模糊查询
+  if (keyword) whereOpt.keyword = new RegExp(keyword);
 
-  if (author) {
-    sql += `and author=? `;
-  }
-  
-  sql += `order by createtime desc;`;
-  
-  const [err, result] = await execSQL(sql, [`${author}`]);
+  const list = await Blog.find(whereOpt).sort({ _id: -1 });
 
-  return err ? undefined : result;
+  return list;
 };
 
 // 博客详情
 const getDetail = async (id) => {
-  const sql = `select * from blogs where id=?`;
+  const blog = await Blog.findById({ _id: id });
 
-  const [err, result] = await execSQL(sql, [`${id}`]);
-
-  return err ? undefined : result;
+  return blog ? [blog] : [];
 };
 
 // 新建博客
 const newBlog = async (blogData = {}) => {
   // blogData 是一个博客信息对象，包含 title content 等属性
-  const { title, content, author } = blogData;
-    
-  const createtime = Date.now();
+  let { title, content, author } = blogData;
+  title = xss(title);
+  content = xss(content);
+  author = xss(author);
 
-  const sql = `
-    INSERT INTO blogs (title, content, createtime, author)
-    values (?,?,?,?)
-  `;
+  const blog = await Blog.create({
+    title,
+    content,
+    author,
+  });
 
-  // 对于创建后可能会展示到页面上的数据进行 xss 漏洞修复
-  const values = [`${xss(title)}`, `${xss(content)}`, createtime, `${xss(author)}`]
-
-  const [err, result] = await execSQL(sql, values);
-
-  return err ? undefined : { id: result.insertId };
+  return { id: blog._id };
 };
 
 // 更新博客
 const updateBlog = async (blogData = {}) => {
   // blogData 是一个博客信息对象，包含 title content 等属性
-  const { title, content, id } = blogData;
+  let title = xss(blogData.title);
+  let content = xss(blogData.content);
+  const id = blogData.id;
 
-  const sql = `UPDATE blogs SET title=?, content=? where id=?`;
+  const blog = await Blog.findOneAndUpdate(
+    { _id: id },
+    { title, content },
+    { new: true }
+  );
 
-
-  // 对于创建后可能会展示到页面上的数据进行 xss 漏洞修复
-  const values = [`${xss(title)}`, `${xss(content)}`, `${id}`]
-
-  const [err, result] = await execSQL(sql, values);
-
-  return err ? undefined : result.affectedRows;
+  return blog;
 };
 
 // 删除 博客
 const deleteBlog = async (blogData = {}) => {
   const { id, author } = blogData;
 
-  const sql = `DELETE FROM blogs WHERE id=? and author=?`;
+  const result = await Blog.findOneAndDelete({ _id: id, author });
 
-  const values = [`${id}`, `${author}`]
-
-  const [err, result] = await execSQL(sql, values);
-
-  return err ? undefined : result.affectedRows;
+  return result;
 };
 
 module.exports = {

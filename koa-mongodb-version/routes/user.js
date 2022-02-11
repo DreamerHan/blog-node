@@ -6,23 +6,24 @@ const { login } = require("../controller/user");
 const { SuccessModel, ErrorModel } = require("../model/resModel");
 
 // 登录
-router.post("/login", async (ctx, next) => {
-  // const { username, password } = ctx.request.body;
-  const { username, password } = ctx.request.body;
+router.get("/login", async (ctx, next) => {
+  const { username, password } = ctx.query;
 
   if (!username || !password) {
     ctx.body = new ErrorModel("登录失败，没有 username 或 password");
     return;
   }
 
-  const result = await login(ctx.request.body);
+  const result = await login(ctx.query);
 
   if (result) {
-    const { id, username, relname } = result;
+    const { id, _id, username, relname } = result;
+
+    const sign = id ? id : _id;
 
     // 假设登录后，session 中通过 userid 对应
-    const userid = `${username}-${id}`;
-    ctx.session[userid] = { id, username, relname };
+    const userid = `${username}-${sign}`;
+    ctx.session[userid] = { id, _id, username, relname };
 
     ctx.body = new SuccessModel("登录成功");
   } else {
