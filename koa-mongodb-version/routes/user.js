@@ -6,15 +6,15 @@ const { login } = require("../controller/user");
 const { SuccessModel, ErrorModel } = require("../model/resModel");
 
 // 登录
-router.get("/login", async (ctx, next) => {
-  const { username, password } = ctx.query;
+router.post("/login", async (ctx, next) => {
+  const { username, password } = ctx.request.body;
 
   if (!username || !password) {
     ctx.body = new ErrorModel("登录失败，没有 username 或 password");
     return;
   }
 
-  const result = await login(ctx.query);
+  const result = await login(ctx.request.body);
 
   if (result) {
     const { id, _id, username, relname } = result;
